@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "b62dcba3-d3f6-41e7-a178-78561fa76a43",
     "name": "OMS Inventory Service",
-    "description": "Requests for retrieving inventory and updating available stock.",
+    "description": "Requests for the OMS product and inventory APIs.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -193,6 +193,215 @@
           "body": "{\n  \"productId\": 1,\n  \"availableQuantity\": 25\n}"
         }
       ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Create Product",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Product was created\", function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.all.keys(\"id\", \"name\", \"sku\", \"price\", \"status\");",
+                  "    pm.expect(response.name).to.eql(pm.collectionVariables.get(\"productName\"));",
+                  "    pm.expect(response.sku).to.eql(pm.collectionVariables.get(\"productSku\"));",
+                  "    pm.collectionVariables.set(\"productId\", String(response.id));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "name",
+                  "value": "{{productName}}",
+                  "type": "text"
+                },
+                {
+                  "key": "sku",
+                  "value": "{{productSku}}",
+                  "type": "text"
+                },
+                {
+                  "key": "price",
+                  "value": "{{productPrice}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/products",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "products"
+              ]
+            },
+            "description": "Creates a product using form fields, matching the current ProductController method signature. Change productSku before sending the request again because SKU is unique."
+          },
+          "response": [
+            {
+              "name": "Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "key": "name",
+                      "value": "Wireless Mouse",
+                      "type": "text"
+                    },
+                    {
+                      "key": "sku",
+                      "value": "OMS-SKU-001",
+                      "type": "text"
+                    },
+                    {
+                      "key": "price",
+                      "value": "799.00",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/products",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "products"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"id\": 1,\n  \"name\": \"Wireless Mouse\",\n  \"sku\": \"OMS-SKU-001\",\n  \"price\": 799.00,\n  \"status\": \"ACTIVE\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get All Products",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 302\", function () {",
+                  "    pm.response.to.have.status(302);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is a product array\", function () {",
+                  "    pm.expect(pm.response.json()).to.be.an(\"array\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/products",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "products"
+              ]
+            },
+            "description": "Returns all products. The current controller returns HTTP 302 FOUND."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Product by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 302\", function () {",
+                  "    pm.response.to.have.status(302);",
+                  "});",
+                  "",
+                  "pm.test(\"Correct product was returned\", function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.all.keys(\"id\", \"name\", \"sku\", \"price\", \"status\");",
+                  "    pm.expect(response.id).to.eql(Number(pm.collectionVariables.get(\"productId\")));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/{{productId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "products",
+                "{{productId}}"
+              ]
+            },
+            "description": "Returns one product by ID. The current controller returns HTTP 302 FOUND."
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "variable": [
@@ -209,6 +418,21 @@
     {
       "key": "stockQuantity",
       "value": "25",
+      "type": "string"
+    },
+    {
+      "key": "productName",
+      "value": "Wireless Mouse",
+      "type": "string"
+    },
+    {
+      "key": "productSku",
+      "value": "OMS-SKU-001",
+      "type": "string"
+    },
+    {
+      "key": "productPrice",
+      "value": "799.00",
       "type": "string"
     }
   ]

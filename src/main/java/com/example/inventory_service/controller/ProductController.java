@@ -22,18 +22,14 @@ public class ProductController {
 
         ProductResponse response= productService.createProduct(request);
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(response);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping()
     public ResponseEntity<List<ProductResponse>> getAllProducts(){
         List<ProductResponse> response =productService.getAllProducts();
 
-        return ResponseEntity
-                .status(HttpStatus.FOUND)
-                .body(response);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
@@ -41,10 +37,7 @@ public class ProductController {
 
         ProductResponse response= productService.getProductById(id);
 
-        return ResponseEntity
-                .status(HttpStatus.FOUND)
-                .body(response);
-
+        return ResponseEntity.ok(response);
     }
 }
 

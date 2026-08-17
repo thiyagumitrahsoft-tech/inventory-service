@@ -30,7 +30,7 @@ public class InventoryController {
 
     @PutMapping("/{productId}/stock")
     public ResponseEntity<InventoryResponse> updateStock(
-            @PathVariable Long productId,@RequestBody StockUpdateRequest request) {
+            @Valid @PathVariable Long productId,@RequestBody StockUpdateRequest request) {
         return ResponseEntity.ok(
                 inventoryService.updateStock(productId, request)
         );

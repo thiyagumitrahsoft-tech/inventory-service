@@ -11,7 +11,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 		title = "Inventory Service API",
 		version = "v1",
 		description = "Product and stock management APIs for the Order Management System"
-), servers = @Server(url = "/", description = "Current host"))
+))
 public class InventoryServiceApplication {
 
 	public static void main(String[] args) {

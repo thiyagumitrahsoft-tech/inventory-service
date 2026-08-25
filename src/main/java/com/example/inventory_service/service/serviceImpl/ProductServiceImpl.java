@@ -1,7 +1,6 @@
 package com.example.inventory_service.service.serviceImpl;
 
 
-import com.example.inventory_service.config.MapperConfig;
 import com.example.inventory_service.dto.ProductRequest;
 import com.example.inventory_service.dto.ProductResponse;
 import com.example.inventory_service.entity.Inventory;
@@ -11,6 +10,8 @@ import com.example.inventory_service.repository.ProductRepository;
 import com.example.inventory_service.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = "productList", allEntries = true)
     public ProductResponse createProduct(ProductRequest request) {
 
         if (request.getSku() != null &&
@@ -48,12 +50,15 @@ public class ProductServiceImpl implements ProductService {
         inventory.setAvailableQuantity(0);
         inventoryRepository.save(inventory);
 
-        return modelMapper.map(savedProduct, ProductResponse.class);
+        ProductResponse response = modelMapper.map(savedProduct, ProductResponse.class);
+
+        return response;
     }
 
     @Override
+    @Cacheable(cacheNames = "productList", key = "'all'")
     public List<ProductResponse> getAllProducts() {
-        List<ProductResponse> response= productRepository.findAll()
+        List<ProductResponse> response = productRepository.findAll()
                 .stream()
                 .map(product -> modelMapper.map(product,ProductResponse.class))
                 .toList();
@@ -62,13 +67,11 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Cacheable(cacheNames = "product", key = "#id")
     public ProductResponse getProductById(Long id) {
-
         Product product= productRepository.findById(id)
                 .orElseThrow(()->new RuntimeException("Product not available"));
 
-        ProductResponse response = modelMapper.map(product, ProductResponse.class);
-
-        return response;
+        return modelMapper.map(product, ProductResponse.class);
     }
 }
